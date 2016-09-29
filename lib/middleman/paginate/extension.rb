@@ -4,6 +4,8 @@ require 'middleman_dato/middleman_extension'
 module Middleman
   module Paginate
     class Extension < ::Middleman::ConfigExtension
+      self.resource_list_manipulator_priority = 0
+
       expose_to_config paginate: :paginate
 
       class Helper
@@ -14,6 +16,20 @@ module Middleman
           @total_pages = total_pages
           @base_path = base_path
           @suffix = suffix
+        end
+      end
+
+      class CollectionDescriptor
+        attr_reader :descriptors
+
+        def initialize(descriptors)
+          @descriptors = descriptors
+        end
+
+        def execute_descriptor(app, sum)
+          descriptors.reduce(sum) do |sum, descriptor|
+            descriptor.execute_descriptor(app, sum)
+          end
         end
       end
 
@@ -58,7 +74,7 @@ module Middleman
           )
         end
 
-        descriptors
+        CollectionDescriptor.new(descriptors)
       end
     end
   end
