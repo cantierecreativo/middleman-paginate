@@ -8,17 +8,6 @@ module Middleman
 
       expose_to_config paginate: :paginate
 
-      class Helper
-        attr_reader :page, :total_pages, :base_path, :suffix
-
-        def initialize(page, total_pages, base_path, suffix)
-          @page = page
-          @total_pages = total_pages
-          @base_path = base_path
-          @suffix = suffix
-        end
-      end
-
       class CollectionDescriptor
         attr_reader :descriptors
 
@@ -33,42 +22,45 @@ module Middleman
         end
       end
 
+      class Pager
+        attr_reader :current_page, :total_pages, :per_page
+
+        def initialize(base_path, suffix, current_page, total_pages, per_page)
+          @base_path = base_path
+          @suffix = suffix
+          @current_page = current_page
+          @total_pages = total_pages
+          @per_page = per_page
+        end
+
+        def next_page
+          current_page < total_pages && current_page + 1
+        end
+
+        def previous_page
+          current_page > 1 && current_page - 1
+        end
+
+        def page_path(page = current_page)
+          "#{@base_path}#{page == 1 ? '' : @suffix.gsub(/:num/, page.to_s)}.html"
+        end
+      end
+
       def paginate(collection, base_path, template, per_page: 20, suffix: "/page/:num", locals: {}, data: {})
         pages = collection.each_slice(per_page).to_a
-        num_pages = pages.size
 
         descriptors = []
 
-        path_builder = ->(page) {
-          "#{base_path}#{page == 1 ? '' : suffix.gsub(/:num/, page.to_s)}.html"
-        }
-
         pages.each_with_index do |page_collection, i|
-          page_num = i + 1
-          next_page_num = page_num < num_pages && page_num + 1
-          previous_page_num = page_num > 1 && page_num - 1
-
-          page_path = path_builder.call(page_num)
-          next_page_path = next_page_num && path_builder.call(next_page_num)
-          previous_page_path = previous_page_num && path_builder.call(previous_page_num)
-
-          meta = ::Middleman::Util.recursively_enhance(
-            page_number: page_num,
-            num_pages: num_pages,
-            per_page: per_page,
-            next_page_num: next_page_num,
-            next_page_path: next_page_path,
-            previous_page_num: previous_page_num,
-            previous_page_path: previous_page_path
-          )
+          pager = Pager.new(base_path, suffix, i + 1, pages.size, per_page)
 
           opts = {
-            locals: locals.merge(items: page_collection, pager: meta),
+            locals: locals.merge(items: page_collection, pager: pager),
             data: data
           }
 
           descriptors << Middleman::Sitemap::Extensions::ProxyDescriptor.new(
-            Middleman::Util.normalize_path(page_path),
+            Middleman::Util.normalize_path(pager.page_path),
             Middleman::Util.normalize_path(template),
             opts
           )
