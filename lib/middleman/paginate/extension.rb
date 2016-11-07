@@ -3,24 +3,8 @@ require 'middleman_dato/middleman_extension'
 
 module Middleman
   module Paginate
-    class Extension < ::Middleman::ConfigExtension
-      self.resource_list_manipulator_priority = 0
-
+    class Extension < ::Middleman::Extension
       expose_to_config paginate: :paginate
-
-      class CollectionDescriptor
-        attr_reader :descriptors
-
-        def initialize(descriptors)
-          @descriptors = descriptors
-        end
-
-        def execute_descriptor(app, sum)
-          descriptors.reduce(sum) do |sum, descriptor|
-            descriptor.execute_descriptor(app, sum)
-          end
-        end
-      end
 
       class Pager
         attr_reader :current_page, :total_pages, :per_page
@@ -47,26 +31,24 @@ module Middleman
       end
 
       def paginate(collection, base_path, template, per_page: 20, suffix: "/page/:num", locals: {}, data: {})
-        pages = collection.each_slice(per_page).to_a
+        collection.tap do |collection|
+          pages = collection.each_slice(per_page).to_a
 
-        descriptors = []
+          pages.each_with_index do |page_collection, i|
+            pager = Pager.new(base_path, suffix, i + 1, pages.size, per_page)
 
-        pages.each_with_index do |page_collection, i|
-          pager = Pager.new(base_path, suffix, i + 1, pages.size, per_page)
+            opts = {
+              locals: locals.merge(items: page_collection, pager: pager),
+              data: data
+            }
 
-          opts = {
-            locals: locals.merge(items: page_collection, pager: pager),
-            data: data
-          }
-
-          descriptors << Middleman::Sitemap::Extensions::ProxyDescriptor.new(
-            Middleman::Util.normalize_path(pager.page_path),
-            Middleman::Util.normalize_path(template),
-            opts
-          )
+            proxy(
+              Middleman::Util.normalize_path(pager.page_path),
+              Middleman::Util.normalize_path(template),
+              opts
+            )
+          end
         end
-
-        CollectionDescriptor.new(descriptors)
       end
     end
   end
