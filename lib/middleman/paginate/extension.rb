@@ -26,7 +26,7 @@ module Middleman
         end
 
         def page_path(page = current_page)
-          "#{@base_path}#{page == 1 ? '' : @suffix.gsub(/:num/, page.to_s)}.html"
+          "#{@base_path}#{page == 1 ? '/index' : @suffix.gsub(/:num/, page.to_s)}.html"
         end
       end
 
