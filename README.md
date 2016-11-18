@@ -22,7 +22,25 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+Consider that middleman-paginate create a page for each set of data sliced from your collection. This page is created by a template. In your config.rb
+
+    paginate data.your_collection, "/episodes", "/templates/episodes.html"
+
+in your pagination template you'll find a collection named ``ìtems``` representig the available data.
+
+    - items.each do |episode|
+        p = episode.title
+
+You also have an object ```pager``` that offers some helpers to build the pagination links.
+
+    - if pager.next_page
+        = link_to "Next page", pager.page_path(pager.next_page)
+    - if pager.previous_page
+        = link_to "Previous page", pager.page_path(pager.previous_page)
+
+The final url will be
+
+    http://127.0.0.1:4567/episodes/page/1.html
 
 ## Development
 
