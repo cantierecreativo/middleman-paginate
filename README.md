@@ -22,7 +22,7 @@ Or install it yourself as:
 
 ## Usage
 
-Consider that middleman-paginate create a page for each set of data sliced from your collection. This page is created by a template. In your config.rb
+Consider that middleman-paginate creates a page for each set of data sliced from your collection. This page is created by a template. In your config.rb
 
     paginate data.your_collection, "/episodes", "/templates/episodes.html"
 
