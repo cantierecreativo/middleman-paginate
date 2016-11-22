@@ -24,23 +24,35 @@ Or install it yourself as:
 
 Consider that middleman-paginate creates a page for each set of data sliced from your collection. This page is created by a template. In your config.rb
 
-    paginate data.your_collection, "/episodes", "/templates/episodes.html"
+```ruby
+paginate data.your_collection, "/episodes", "/templates/episodes.html"
+```
 
-in your pagination template you'll find a collection named ``ìtems``` representig the available data.
+in your pagination template you'll find a collection named `items` with the objects for the specific page:
 
-    - items.each do |episode|
-        p = episode.title
+```ruby
+- items.each do |episode|
+  p= episode.title
+```
 
-You also have an object ```pager``` that offers some helpers to build the pagination links.
+You also have an object `pager` that offers some helpers to build the pagination links:
 
-    - if pager.next_page
-        = link_to "Next page", pager.page_path(pager.next_page)
-    - if pager.previous_page
-        = link_to "Previous page", pager.page_path(pager.previous_page)
+```ruby
+- if pager.next_page
+  = link_to "Next page", pager.page_path(pager.next_page)
+- if pager.previous_page
+  = link_to "Previous page", pager.page_path(pager.previous_page)
+```
 
-The final url will be
+The final URLs will be:
 
-    http://127.0.0.1:4567/episodes/page/1.html
+```
+http://127.0.0.1:4567/episodes.html
+http://127.0.0.1:4567/episodes/page/2.html
+http://127.0.0.1:4567/episodes/page/3.html
+```
+
+and so on.
 
 ## Development
 
