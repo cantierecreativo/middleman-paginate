@@ -35,11 +35,16 @@ module Middleman
         end
 
         def page_path(page = current_page)
-          "#{@base_path}#{page == 1 ? '/index' : @suffix.gsub(/:num/, page.to_s)}.html"
+          path = "#{@base_path}#{page == 1 ? '/index' : @suffix.gsub(/:num/, page.to_s)}.html"
+          if path.end_with?("/index.html")
+            path.gsub(/index\.html$/, '')
+          else
+            path
+          end
         end
       end
 
-      def paginate(collection, base_path, template, per_page: 20, suffix: "/page/:num", locals: {}, data: {})
+      def paginate(collection, base_path, template, per_page: 20, suffix: "/page/:num/index", locals: {}, data: {})
         pages = collection.each_slice(per_page).to_a
         descriptors = []
 
