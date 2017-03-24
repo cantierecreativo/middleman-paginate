@@ -2,8 +2,6 @@
 
 Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/middleman/paginate`. To experiment with that code, run `bin/console` for an interactive prompt.
 
-TODO: Delete this and the text above, and describe your gem
-
 ## Installation
 
 Add this line to your application's Gemfile:
@@ -25,7 +23,7 @@ Or install it yourself as:
 Consider that middleman-paginate creates a page for each set of data sliced from your collection. This page is created by a template. In your config.rb
 
 ```ruby
-paginate data.your_collection, "/episodes", "/templates/episodes.html"
+paginate data.your_collection, "/episodes", "/templates/episodes.html", suffix: "/page/:num", per_page: 20
 ```
 
 in your pagination template you'll find a collection named `items` with the objects for the specific page:
