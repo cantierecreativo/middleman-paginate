@@ -34,12 +34,16 @@ module Middleman
           current_page > 1 && current_page - 1
         end
 
+        def full_page_path(page = current_page)
+          "#{@base_path}#{page == 1 ? '/index' : @suffix.gsub(/:num/, page.to_s)}.html"
+        end
+
         def page_path(page = current_page)
-          path = "#{@base_path}#{page == 1 ? '/index' : @suffix.gsub(/:num/, page.to_s)}.html"
-          if path.end_with?("/index.html")
-            path.gsub(/index\.html$/, '')
+          full_path = full_page_path(page)
+          if full_path.end_with?("/index.html")
+            full_path.gsub(/index\.html$/, '')
           else
-            path
+            full_path
           end
         end
       end
@@ -57,7 +61,7 @@ module Middleman
           }
 
           descriptors << Middleman::Sitemap::Extensions::ProxyDescriptor.new(
-            Middleman::Util.normalize_path(pager.page_path),
+            Middleman::Util.normalize_path(pager.full_page_path),
             Middleman::Util.normalize_path(template),
             opts.dup
           )
