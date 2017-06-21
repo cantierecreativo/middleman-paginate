@@ -48,7 +48,7 @@ module Middleman
         end
       end
 
-      def paginate(collection, base_path, template, per_page: 20, suffix: "/page/:num/index", locals: {}, data: {})
+      def paginate(collection, base_path, template, per_page: 20, suffix: "/page/:num/index", locals: {}, data: {}, locale: nil)
         pages = collection.each_slice(per_page).to_a
         descriptors = []
 
@@ -57,7 +57,8 @@ module Middleman
 
           opts = {
             locals: locals.merge(items: page_collection, pager: pager),
-            data: data
+            data: data,
+            locale: locale
           }
 
           descriptors << Middleman::Sitemap::Extensions::ProxyDescriptor.new(
