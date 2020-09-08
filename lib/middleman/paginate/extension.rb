@@ -1,5 +1,4 @@
 require 'middleman-core'
-require 'middleman_dato/middleman_extension'
 
 module Middleman
   module Paginate
